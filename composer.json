@@ -3,6 +3,7 @@
     "description": "A extens of yii2",
     "type": "yii2-extension",
     "keywords": ["yii2","extension"],
+    "homepage": "https://github.com/joker403/yii2-sms",
     "license": "MIT",
     "authors": [
         {

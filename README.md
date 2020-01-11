@@ -1,6 +1,6 @@
 joker403\yii2-sms
 =================
-A extens of yii2
+A SMS extension of yii2
 
 Installation
 ------------
