@@ -2,18 +2,16 @@
 
 namespace yii\sms;
 
-use common\components\sms\template\Code;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
 
 
-class Sms extends Component
-{
+class Sms extends Component{
     public $drive;
     public $template = []; //消息模板配置
-    public $defaultCodeClass = 'yii\sms\template\Code'; //默认的验证码模板
-    public $defaultTempalteClass =  'yii\sms\Template'; //默认的内容模板
+//    public $defaultCodeClass = 'yii\sms\template\Code'; //默认的验证码模板
+    public $defaultTempalteClass =  'yii\sms\template\BasicTemp'; //默认的内容模板
 
     public $_drive;
 
@@ -34,120 +32,50 @@ class Sms extends Component
 
         $this->_drive = Yii::createObject($this->drive);
         if (!$this->_drive instanceof SmsInterface) {
-            throw new Exception("drive 类必须设置并继承 SmsInterface");
+            throw new Exception("drive 类必须设置并继承 DriveInterface");
         }
     }
 
 
     /**
-     * @param $mobile
-     * @param $content
+     * 发送消息
+     * @param $mobile  手机号
+     * @param $content 内容
      * @return bool
      */
-    public function sendMessage($mobile, $content = '')
+    public function sendMsg($mobile, $content = '')
     {
         return $this->_drive->send($mobile, $content);
     }
 
     /**
+     * 发送模板消息 （模板可以再config里配置）
      * @param $mobile
-     */
-    public function sendCode($mobile, $template = '')
-    {
-        if (empty($template)) {
-            $config = ['class' => $this->defaultCodeClass];
-        } elseif (!empty($template) && isset($this->template[$template])) {
-            if (!isset($this->template[$template]['class'])) {
-                $this->template[$template]['class'] = $this->defaultCodeClass;
-            }
-            $config = $this->template[$template];
-        } else {
-            throw new Exception("短信模板template配置中未配置该摸坂");
-        }
-
-        $config['mobile'] = $mobile;
-        $codeObj = Yii::createObject($config);
-
-        if (!$codeObj instanceof Template) {
-            throw new Exception("模板需要继承Template");
-        }
-
-        if (!$codeObj->beforeSend()) {
-            $error = $codeObj->getError();
-            $this->error = !empty($error) ? $error : '发送前检测未通过';
-            return false;
-        }
-
-        $result = $this->sendMessage($mobile, $codeObj->getContent());
-
-        $codeObj->afterSend($result);
-        return $result;
-    }
-
-    /**
-     * @param $mobile
-     */
-    public function sendCodeNew($mobile, $template = '', $type)
-    {
-        if (empty($template)) {
-            $config = ['class' => $this->defaultCodeClass];
-        } elseif (!empty($template) && isset($this->template[$template])) {
-            if (!isset($this->template[$template]['class'])) {
-                $this->template[$template]['class'] = $this->defaultCodeClass;
-            }
-            $config = $this->template[$template];
-        } else {
-            throw new Exception("短信模板template配置中未配置该摸坂");
-        }
-
-        $config['mobile'] = $mobile;
-        $config['type'] = $type;
-        $codeObj = Yii::createObject($config);
-
-        if (!$codeObj instanceof Template) {
-            throw new Exception("模板需要继承Template");
-        }
-
-        if (!$codeObj->beforeSend()) {
-            $error = $codeObj->getError();
-            $this->error = !empty($error) ? $error : '发送前检测未通过';
-            return false;
-        }
-
-        $result = $this->sendMessage($mobile, $codeObj->getContent());
-
-        $codeObj->afterSend($result);
-        return $result;
-    }
-
-    /**
-     * @param $mobile
-     * @param $code
      * @param string $template
-     * @return mixed
-     * @throws Exception
-     * @throws \yii\base\InvalidConfigException
      */
-    public function checkCode($mobile, $code, $template = '')
-    {
-        if (empty($template)) {
-            $config = ['class' => $this->defaultCodeClass];
-        } elseif (!empty($template) && isset($this->template[$template])) {
-            if (!isset($this->template[$template]['class'])) {
-                $this->template[$template]['class'] = $this->defaultCodeClass;
-            }
-            $config = $this->template[$template];
-        } else {
-            throw new Exception("短信模板template配置中未配置该摸坂");
+    public function sendTempMsg($mobile,$template){
+        //获取要使用的模板
+        if (!isset($this->template[$template])) {
+            throw new Exception("短信模板template未配置该模板");
         }
+        //未配置模板的话，使用默认模板
+        if(!isset($this->template[$template]['class'])){
+            $this->template[$template]['class'] = $this->defaultTempalteClass;
+        }
+        $config = $this->template[$template];
 
+        //创建模板对象
         $config['mobile'] = $mobile;
-        $codeObj = Yii::createObject($config);
-
-        if (!$codeObj instanceof Template) {
+        $tempObj = Yii::createObject($config);
+        if (!$tempObj instanceof Template) {
             throw new Exception("模板需要继承Template");
         }
 
-        return $codeObj->checkCode($code);
+
+
+        //发送短信
+        $result = $this->sendMessage($mobile,$tempObj->getContent());
+
+        return $result;
     }
 }

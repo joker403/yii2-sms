@@ -1,17 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: cxf
- * Date: 2018/9/30
- * Time: 3:13
+ * 模板：基础消息模板
+ * @author:      cxf
+ * @version：    1.0
+ * @date:        2020/1/11 18:50
  */
 
-namespace yii\sms;
+namespace yii\sms\template;
 
-use yii\base\BaseObject;
+
+use yii\base\Behavior;
 use yii\helpers\ArrayHelper;
 
-class Template extends BaseObject
+class BasicTemp extends Behavior
 {
     public $head = "【XXX系统】";
 
@@ -30,17 +31,5 @@ class Template extends BaseObject
             $this->param = ArrayHelper::merge($this->param,$param);
         }
         return $this->head.strtr($this->body,$this->param);
-    }
-
-    public function beforeSend(){
-        return true;
-    }
-
-    /**
-     * @param $result 发送的结果
-     * @return bool
-     */
-    public function afterSend($result){
-        return true;
     }
 }
