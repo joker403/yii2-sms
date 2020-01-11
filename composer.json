@@ -1,0 +1,21 @@
+{
+    "name": "joker403/yii2-sms",
+    "description": "A extens of yii2",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "chaoxuefeng",
+            "email": "418519364@qq.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "joker403\\sms\\": ""
+        }
+    }
+}
